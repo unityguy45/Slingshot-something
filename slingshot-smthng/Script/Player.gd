@@ -25,7 +25,7 @@ func _ready() -> void:
 	trail = Line2D.new()
 	trail.top_level = true
 	trail.width = 6.0
-	trail.default_color = Color(0.6, 1.8, 2.2)
+	trail.default_color = Color(1.4, 0.7, 0.3)
 	var g := Gradient.new()
 	g.set_color(0, Color(1, 1, 1, 0))
 	g.set_color(1, Color(1, 1, 1, 1))
@@ -86,7 +86,9 @@ func _physics_process(delta: float) -> void:
 					return
 			vel = vel.limit_length(FLY_SPEED * 1.4)
 			position += vel * delta
-	trail.add_point(global_position)
+	var heading := vel.angle() if state == "fly" else angle + dir * PI / 2.0
+	rotation = lerp_angle(rotation, heading, 0.35)
+	trail.add_point(global_position - Vector2.from_angle(rotation) * 20.0)
 	while trail.get_point_count() > 24:
 		trail.remove_point(0)
 	queue_redraw()
@@ -102,5 +104,19 @@ func _die() -> void:
 func _draw() -> void:
 	if state == "dead":
 		return
-	draw_circle(Vector2.ZERO, 16.0, Color(0.5, 1.5, 2.0, 0.25))
-	draw_circle(Vector2.ZERO, 9.0, Color(2.0, 2.6, 3.0))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.7, 1.7))
+	var flicker := randf_range(0.8, 1.2)
+	var flame := 18.0 if state == "fly" else 9.0
+	draw_colored_polygon(PackedVector2Array([Vector2(-11, -4), Vector2(-11 - flame * flicker, 0), Vector2(-11, 4)]), Color(1.6, 0.6, 0.15))
+	draw_colored_polygon(PackedVector2Array([Vector2(-11, -2), Vector2(-11 - flame * 0.5 * flicker, 0), Vector2(-11, 2)]), Color(1.0, 0.9, 0.5))
+	var wing := Color(0.85, 0.2, 0.25)
+	draw_colored_polygon(PackedVector2Array([Vector2(4, -5), Vector2(-12, -15), Vector2(-9, -5)]), wing)
+	draw_colored_polygon(PackedVector2Array([Vector2(4, 5), Vector2(-12, 15), Vector2(-9, 5)]), wing)
+	var body := PackedVector2Array([Vector2(20, 0), Vector2(8, -6), Vector2(-11, -6), Vector2(-11, 6), Vector2(8, 6)])
+	draw_colored_polygon(body, Color(0.88, 0.9, 0.95))
+	draw_colored_polygon(PackedVector2Array([Vector2(20, 0), Vector2(8, -6), Vector2(8, 6)]), Color(0.85, 0.2, 0.25))
+	var outline := body.duplicate()
+	outline.append(body[0])
+	draw_polyline(outline, Color(0.1, 0.1, 0.15), 1.2, true)
+	draw_circle(Vector2(2, 0), 3.2, Color(0.25, 0.75, 1.0))
+	draw_circle(Vector2(1, -1), 1.2, Color(0.9, 0.97, 1.0))

@@ -16,7 +16,7 @@ You fly a small ship around an open solar system, using planet gravity to slings
 
 ## Demo
 
-**Play it on itch.io:** https://hesitant.itch.io/slingshot-smthng
+**Download it on itch.io:** https://hesitant.itch.io/slingshot-smthng
 
 What's in the demo:
 - An open solar system with a sun, 7 planets, moons, an asteroid belt and a black hole, all moving on real orbits
